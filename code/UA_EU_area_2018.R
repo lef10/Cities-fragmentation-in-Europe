@@ -62,7 +62,7 @@ process_city <- lapply(UA_gpkg,function(s){
                                    (s$code_2018 == "50000" ~ "water"),
                                    TRUE ~ "NA"))
   
- # calcule de la superficie de la couverture des sols 
+ # calcul de la superficie de la couverture des sols 
 
 classif_area<-data.frame(aggregate(s$area, list(s$classif), sum)) 
   
