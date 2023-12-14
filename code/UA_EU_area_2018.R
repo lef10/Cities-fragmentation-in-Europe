@@ -23,8 +23,7 @@ UA_gpkg<-lapply(files_gpkg[1:788],function(gpkg){
   
   message(paste(cityname, citycode))
   
-  return(sf) #I like to put a return at the end of a function for clarity,
-  #if you don't the last object computed is reported, which is fine in this case
+  return(sf) 
 })
 
 
@@ -63,31 +62,20 @@ process_city <- lapply(UA_gpkg,function(s){
                                    (s$code_2018 == "50000" ~ "water"),
                                    TRUE ~ "NA"))
   
-  
-  #classif_area <- data.frame(aggregate(s$area ~ s$classif, data = s, sum, na.rm = TRUE))
+ # calcule de la superficie de la couverture des sols 
+
 classif_area<-data.frame(aggregate(s$area, list(s$classif), sum)) 
-# classif_pop<-data.frame(aggregate(s$Pop2018, list(s$classif), sum))
-# aggreg<-merge(classif_pop,classif_area, by = "Group.1")
   
   names(classif_area)<-c("classif", "sum_area")
-  
-  # aggreg$total_pop<-sum(aggreg$sum_pop)
+
 classif_area$total_area<-sum(classif_area$sum_area)
 classif_area$percentage_area<-classif_area$sum_area/classif_area$total_area
-  
-  # aggreg$class_pop_density <- aggreg$sum_pop/aggreg$sum_area
-  # aggreg$pop_density <- aggreg$sum_pop/aggreg$total_area
-#classif_area$percentage_classif <- classif_area$sum_area/classif_area$total_area
-  #aggreg$percentage_pop <- aggreg$sum_pop/aggreg$total_pop
+
   
 classif_area$cityname<-st_drop_geometry(s)[1,"fua_name"]
 classif_area$citycode<-st_drop_geometry(s)[1,"fua_code"]
   
-  # Calcul des surfaces par catégories
-  # city_area <- s %>%
-  #   group_by(class) %>%
-  #   summarise_if(is.numeric, sum) 
-  # 
+
   return(classif_area)
 })
 process_city
@@ -97,4 +85,5 @@ process_city
 long_sums<-do.call(rbind,process_city)
 write.csv(long_sums, file = "output/process_city_area.csv", row.names = FALSE)
 
+# conserver les données sur R
 saveRDS(long_sums,"output/long_sums_2018.rds")
